@@ -59,6 +59,7 @@ lerobot-record \
 """
 
 import logging
+import re
 import time
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -93,6 +94,7 @@ from lerobot.robots import (  # noqa: F401
     Robot,
     RobotConfig,
     bi_so100_follower,
+    bi_so101_follower,
     hope_jr,
     koch_follower,
     make_robot_from_config,
@@ -103,6 +105,7 @@ from lerobot.teleoperators import (  # noqa: F401
     Teleoperator,
     TeleoperatorConfig,
     bi_so100_leader,
+    bi_so101_leader,
     homunculus,
     koch_leader,
     make_teleoperator_from_config,
@@ -202,6 +205,44 @@ class RecordConfig:
     def __get_path_fields__(cls) -> list[str]:
         """This enables the parser to load config from the policy using `--policy.path=local/dir`"""
         return ["policy"]
+
+
+
+ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+ANSI_BARE_CSI_RE = re.compile(r"\[[0-9;]*m")
+
+
+def _strip_ansi(text: str) -> str:
+    text = ANSI_ESCAPE_RE.sub("", text)
+    text = ANSI_BARE_CSI_RE.sub("", text)
+    return "".join(ch for ch in text if ch.isprintable())
+
+
+def _normalize_repo_id(repo_id: Any) -> str:
+    if isinstance(repo_id, dict):
+        if len(repo_id) != 1:
+            raise ValueError("dataset.repo_id must be a string like '<user>/<dataset>'.")
+        repo_id = next(iter(repo_id.values()))
+    elif isinstance(repo_id, list):
+        if len(repo_id) != 1:
+            raise ValueError("dataset.repo_id must be a string like '<user>/<dataset>'.")
+        repo_id = repo_id[0]
+
+    if not isinstance(repo_id, str):
+        raise ValueError("dataset.repo_id must be a string like '<user>/<dataset>'.")
+
+    repo_id = _strip_ansi(repo_id).strip()
+    if repo_id.lower().startswith("user:"):
+        repo_id = repo_id.split(":", 1)[1].strip()
+
+    if " " in repo_id or "/" not in repo_id:
+        raise ValueError(
+            "dataset.repo_id must be '<user>/<dataset>' (no spaces). "
+            "If you set HF_USER from 'huggingface-cli whoami', use '--raw' or pass "
+            "--dataset.repo_id directly."
+        )
+
+    return repo_id
 
 
 """ --------------- record_loop() data flow --------------------------
@@ -372,6 +413,7 @@ def record_loop(
 @parser.wrap()
 def record(cfg: RecordConfig) -> LeRobotDataset:
     init_logging()
+    cfg.dataset.repo_id = _normalize_repo_id(cfg.dataset.repo_id)
     logging.info(pformat(asdict(cfg)))
     if cfg.display_data:
         init_rerun(session_name="recording")

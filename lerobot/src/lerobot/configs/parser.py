@@ -14,6 +14,7 @@
 import importlib
 import inspect
 import pkgutil
+import re
 import sys
 from argparse import ArgumentError
 from collections.abc import Callable, Iterable, Sequence
@@ -31,6 +32,20 @@ F = TypeVar("F", bound=Callable[..., object])
 
 PATH_KEY = "path"
 PLUGIN_DISCOVERY_SUFFIX = "discover_packages_path"
+
+
+ANSI_ESCAPE_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+ANSI_BARE_CSI_RE = re.compile(r"\[[0-9;]*m")
+
+
+def sanitize_cli_args(args: Sequence[str]) -> list[str]:
+    """Remove non-printable characters from CLI args to prevent parser failures."""
+    cleaned_args = []
+    for arg in args:
+        arg = ANSI_ESCAPE_RE.sub("", arg)
+        arg = ANSI_BARE_CSI_RE.sub("", arg)
+        cleaned_args.append("".join(ch for ch in arg if ch.isprintable()))
+    return cleaned_args
 
 
 def get_cli_overrides(field_name: str, args: Sequence[str] | None = None) -> list[str] | None:
