@@ -30,7 +30,7 @@ First, clone the repository and navigate into the directory:
 
 ```bash
 git clone https://github.com/leehe228/lerobot-so101-bimanual.git
-cd lerobot-so101-bimanual/library/lerobot
+cd lerobot-so101-bimanual/lerobot
 ```
 
 ```bash
