@@ -37,6 +37,17 @@ lerobot-replay \
   --dataset.episode=0
 ```
 
+Example replay with bimanual so101:
+```shell
+lerobot-replay \
+  --robot.type=bi_so101_follower \
+  --robot.left_arm_port=/dev/tty.usbmodem5AF71207621 \
+  --robot.right_arm_port=/dev/tty.usbmodem5AF71733501 \
+  --robot.id=bimanual_follower \
+  --dataset.repo_id=${HF_USER}/record-test \
+  --dataset.episode=0
+```
+
 """
 
 import logging
@@ -54,6 +65,7 @@ from lerobot.robots import (  # noqa: F401
     Robot,
     RobotConfig,
     bi_so100_follower,
+    bi_so101_follower,
     hope_jr,
     koch_follower,
     make_robot_from_config,
