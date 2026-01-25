@@ -1,0 +1,4 @@
+left_follower: /dev/tty.usbmodem5AF71207621
+left_leader: /dev/tty.usbmodem5AF71207991
+right_follower: /dev/tty.usbmodem5AF71733501
+right_leader: /dev/tty.usbmodem5AF71734571
