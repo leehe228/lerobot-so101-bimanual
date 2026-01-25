@@ -1,0 +1,18 @@
+front: 
+  type: opencv
+  index_or_path: 1
+  width: 1280
+  height: 720
+  fps: 30
+wrist: # left
+  type: opencv
+  index_or_path: 0
+  width: 1280
+  height: 720
+  fps: 30
+wrist2: # right
+  type: opencv
+  index_or_path: 2
+  width: 1280
+  height: 720
+  fps: 30
