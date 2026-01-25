@@ -1,0 +1,7 @@
+num_eposides: 1
+single_task: Pull the cloth on both sides.
+hf_user: leehe228
+repo: record-test
+push_to_hub: False
+episode_time_s: 10
+reset_time_s: 10
