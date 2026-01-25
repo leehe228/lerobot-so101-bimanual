@@ -229,3 +229,17 @@ If you uploaded your dataset to the hub with `--control.push_to_hub=true`, you c
 ```bash
 echo ${HF_USER}/so101_test
 ```
+
+### Replay a Dataset
+
+You can replay a recorded episode on the bimanual follower robot:
+
+```bash
+lerobot-replay \
+  --robot.type=bi_so101_follower \
+  --robot.left_arm_port=/dev/tty.aaaa \
+  --robot.right_arm_port=/dev/tty.bbbb \
+  --robot.id=bimanual_follower \
+  --dataset.repo_id=${HF_USER}/record-test \
+  --dataset.episode=0
+```
